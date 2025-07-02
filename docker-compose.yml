@@ -1,0 +1,31 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql_server
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: 'SenhaSuperForte!2025'
+      MSSQL_PID: 'Express'
+    ports:
+      - '1433:1433'
+    volumes:
+      - sql_data:/var/opt/mssql
+      - ./init-db.sh:/init-db.sh
+    entrypoint: >
+      /bin/bash -c "/opt/mssql/bin/sqlservr & sleep 20 && /init-db.sh"
+
+  api:
+    build:
+      context: .
+      dockerfile: SistemaLogin.Api/Dockerfile
+    container_name: sistema_login_api
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=SistemaLoginDb;User Id=sa;Password=SenhaSuperForte!2025;TrustServerCertificate=true;
+    ports:
+      - '5000:8080'
+
+volumes:
+  sql_data:

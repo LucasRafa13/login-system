@@ -1,0 +1,115 @@
+# Compiled source #
+###################
+bin/
+obj/
+out/
+publish/
+
+# User-specific files #
+######################
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS generated files #
+######################
+.DS_Store
+Thumbs.db
+
+# Visual Studio Code #
+######################
+.vscode/
+.vscode-test/
+
+# JetBrains Rider #
+###################
+.idea/
+*.sln.iml
+
+# Logs and database #
+#####################
+*.log
+*.vspscc
+*.vssscc
+*.dbmdl
+*.mdf
+*.ldf
+
+# Dotnet tools #
+################
+.dotnet/
+tools/
+
+# Test results #
+################
+TestResults/
+*.coverage
+*.coveragexml
+
+# Paket dependency manager #
+############################
+.paket/
+paket-files/
+
+# NPM Packages #
+################
+node_modules/
+
+# Secrets #
+###########
+secrets.json
+
+# Docker #
+##########
+*.pid
+docker-compose.override.yml
+
+# EF Core Migrations snapshots #
+################################
+Migrations/
+
+# VS for Mac #
+##############
+*.pidb
+*.userprefs
+
+# Local env #
+#############
+.env
+.env.*
+
+# Temporary files #
+###################
+*.tmp
+*.temp
+
+# HTTP files #
+##############
+*.http
+
+# ReSharper #
+#############
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# Rider #
+#########
+.idea/
+.idea/*
+*.sln.iml
+
+# Backup files #
+################
+*~
+
+# dotCover #
+############
+*.dotCover
+
+# Others #
+##########
+*.ncrunch*
+*.sqllite
+*.sqlite
+*.bak
