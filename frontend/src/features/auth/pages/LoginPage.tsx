@@ -1,15 +1,16 @@
-
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import Logo from '@/components/Logo'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
 import Button from '@/components/Button'
+import PasswordInput from '@/features/components/PasswordInput'
+import { useAuth } from '@/hooks/useAuth'
 
 const loginSchema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -19,8 +20,8 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
-  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const { login } = useAuth()
 
   const {
     register,
@@ -31,12 +32,24 @@ export default function LoginPage() {
     mode: 'onTouched',
   })
 
-  // Fake submit para testar loading
   const onSubmit = async (data: LoginFormValues) => {
     setLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 1200))
-    setLoading(false)
-    navigate('/')
+    try {
+      const response = await fetch('http://localhost:5000/api/Auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) throw new Error('Erro ao fazer login.')
+
+      const { token } = await response.json()
+      login(token)
+    } catch (err) {
+      alert('Credenciais inválidas.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -68,9 +81,8 @@ export default function LoginPage() {
               placeholder="seuemail@dominio.com"
               required
             />
-            <Input
+            <PasswordInput
               label="Senha"
-              type="password"
               autoComplete="current-password"
               {...register('password')}
               error={errors.password?.message}

@@ -1,10 +1,38 @@
 import { motion } from 'framer-motion'
-import Logo from '@/components/Logo'
-import { LogOut } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { useEffect, useState } from 'react'
+import { LogOut } from 'lucide-react'
+import Logo from '@/components/Logo'
+
+type User = {
+  id: number
+  name: string
+  email: string
+}
 
 export default function HomePage() {
   const { logout } = useAuth()
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (!token) return logout()
+
+    fetch('http://localhost:5000/api/Auth/me', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Não autenticado')
+        const data = await res.json()
+        setUser(data)
+      })
+      .catch(() => {
+        logout()
+      })
+  }, [logout])
 
   return (
     <div
@@ -25,10 +53,7 @@ export default function HomePage() {
           <Logo width={130} height={40} />
         </motion.div>
         <button
-          onClick={() => {
-            console.log('[HomePage] Logout clicado')
-            logout()
-          }}
+          onClick={logout}
           className="flex items-center gap-2 text-blue-600 font-semibold px-4 py-2 rounded-lg hover:bg-blue-50 transition"
           data-testid="homepage-logout"
         >
@@ -42,7 +67,6 @@ export default function HomePage() {
         className="flex-1 flex flex-col w-full px-4 py-8"
         data-testid="homepage-main"
       >
-        {/* Logo central com animação */}
         <motion.div
           initial={{ opacity: 0, scale: 0.7, y: 40 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -57,11 +81,10 @@ export default function HomePage() {
             transition={{ delay: 1.1, duration: 0.6 }}
             className="text-xl font-bold text-blue-700 tracking-tight"
           >
-            Seja bem-vindo!
+            Seja bem-vindo{user ? `, ${user.name.split(' ')[0]}` : ''}!
           </motion.span>
         </motion.div>
 
-        {/* Texto institucional e tecnologias */}
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
@@ -73,7 +96,11 @@ export default function HomePage() {
             Projeto simples que desenvolvi em 2 dias para mostrar minhas
             habilidades com frontend e backend em C#!
           </div>
-          <div className="mb-5 text-gray-500">Espero que gostem! 🙂</div>
+          <div className="mb-5 text-gray-500">
+            {user?.email
+              ? `Logado como: ${user.email}`
+              : 'Esperando autenticação...'}
+          </div>
           <div className="mt-4">
             <span className="block font-semibold text-gray-700 mb-2">
               Tecnologias utilizadas:
@@ -94,7 +121,6 @@ export default function HomePage() {
   )
 }
 
-// Badge de tecnologia
 function TechBadge({ children }: { children: string }) {
   return (
     <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 font-semibold rounded-lg text-sm shadow-sm hover:bg-blue-200 transition">

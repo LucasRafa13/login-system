@@ -23,6 +23,19 @@ var audience = jwtSection["Audience"];
 if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience))
     throw new ArgumentException("Configurações JWT ausentes ou incompletas.");
 
+// 🌐 Política de CORS
+var corsPolicyName = "_defaultCorsPolicy";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: corsPolicyName, policy =>
+    {
+        policy
+            .AllowAnyOrigin()     // ou .WithOrigins("http://localhost:5173") se quiser restringir
+            .AllowAnyHeader()
+            .AllowAnyMethod();    // inclui OPTIONS, POST, GET, etc.
+    });
+});
+
 // 📦 Serviços
 builder.Services.AddControllers();
 
@@ -83,6 +96,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors(corsPolicyName); // 👈 CORS ativado antes de auth
 
 app.UseAuthentication();
 app.UseAuthorization();

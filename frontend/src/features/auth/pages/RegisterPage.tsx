@@ -9,6 +9,7 @@ import Logo from '@/components/Logo'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
 import Button from '@/components/Button'
+import PasswordInput from '@/features/components/PasswordInput'
 
 const registerSchema = z
   .object({
@@ -39,10 +40,25 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterFormValues) => {
     setLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 1200))
-    setLoading(false)
-    // Cadastro fake, redireciona para login
-    navigate('/')
+    try {
+      const response = await fetch('http://localhost:5000/api/Auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+        }),
+      })
+
+      if (!response.ok) throw new Error('Erro ao registrar.')
+
+      navigate('/')
+    } catch (err) {
+      alert('Erro ao criar conta.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -82,18 +98,16 @@ export default function RegisterPage() {
               placeholder="seuemail@dominio.com"
               required
             />
-            <Input
+            <PasswordInput
               label="Senha"
-              type="password"
               autoComplete="new-password"
               {...register('password')}
               error={errors.password?.message}
               placeholder="Crie uma senha"
               required
             />
-            <Input
+            <PasswordInput
               label="Confirmar senha"
-              type="password"
               autoComplete="new-password"
               {...register('confirmPassword')}
               error={errors.confirmPassword?.message}
